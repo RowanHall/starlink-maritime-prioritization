@@ -1,34 +1,39 @@
-# CSC 466 Project Proposal — Maritime Starlink Traffic Prioritization
+# Prioritizing Maritime Starlink Traffic for Commercial Fishing Vessels
 
-Static project website for the CSC 466 proposal *"Prioritizing Maritime Starlink
-Traffic for Commercial Fishing Vessels"* (Jasper McLennan, Rowan Hall).
+A CSC 466 research project exploring whether smart edge queue management can protect
+essential vessel operations on Starlink while allowing crew use the network.
 
-Plain HTML/CSS — no build step. `index.html` + `style.css`.
+**Live site:** https://rowanhall.github.io/starlink-maritime-prioritization/
 
-## Preview locally
+**Team:** Jasper McLennan, Rowan Hall 
+**Course:** CSC 466, University of Victoria
 
-Open `index.html` directly in a browser, or serve it:
+## The Problem
 
-```sh
-python3 -m http.server 8000   # then visit http://localhost:8000
-```
+Commercial fishing vessels increasingly depend on Starlink for both essential operations
+and crew welfare. When off-shift crew use high-bandwidth apps (video streaming, cloud
+backups), the shared uplink saturates and suffers **bufferbloat** 
 
-## Deploy to GitHub Pages
+This causes latency spikes that can disrupt critical bridge traffic and vessel telematics. 
+This causes operators to restrict crew to messaging and light browsing to
+avoid interfering with essential ship operations. Having experience in the fishing industry, we
+have lived this trade-off firsthand.
 
-1. Create a repo on GitHub (e.g. `csc466-starlink-qos`) and push these files:
+## Our Approach
 
-   ```sh
-   git init
-   git add .
-   git commit -m "Initial project proposal site"
-   git branch -M main
-   git remote add origin https://github.com/<you>/csc466-starlink-qos.git
-   git push -u origin main
-   ```
+We want to replace that policy with **edge traffic prioritization and Active Queue
+Management** (e.g. FQ-CoDel / CAKE, or dynamic rate-limiting) tuned to Starlink's fluctuating
+capacity. Our goal is to let queue management automatically protect necessary operational traffic, allowing
+crew to use the network without risk.
 
-2. On GitHub: **Settings → Pages → Build and deployment**, set
-   **Source = Deploy from a branch**, **Branch = `main` / `root`**, save.
+## Plan
 
-3. The site goes live at `https://<you>.github.io/csc466-starlink-qos/`
-   within a minute or two. Paste that URL into the proposal's
-   "public website url" line and the Teams post.
+1. **Benchmark & test locally** — measure baseline latency under load and compare queueing/QoS
+   policies on a controlled testbed (possibly using UVic's Starlink setup).
+2. **Deploy on a real vessel** — run the most promising configuration on an edge
+   gateway/router connected to an active vessel terminal and measure real-world improvement
+   under crew load.
+
+## This Repository
+
+Static website hosted on GitHub Pages
