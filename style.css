@@ -1,0 +1,206 @@
+:root {
+  --ink:        #1a1a1a;
+  --ink-soft:   #44474d;
+  --muted:      #8a8f98;
+  --rule:       #e4e2dd;
+  --paper:      #fbfaf7;
+  --accent:     #1d4e6f;   /* deep maritime blue */
+  --accent-bg:  #eef3f6;
+  --max:        720px;
+}
+
+* { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: "Newsreader", Georgia, "Times New Roman", serif;
+  font-size: 19px;
+  line-height: 1.62;
+  font-optical-sizing: auto;
+}
+
+.wrap {
+  max-width: var(--max);
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+/* ---- Masthead ---- */
+.masthead {
+  border-bottom: 1px solid var(--rule);
+  padding: 72px 0 40px;
+  background: linear-gradient(180deg, #fff 0%, var(--paper) 100%);
+}
+.eyebrow {
+  font-family: "Inter", system-ui, sans-serif;
+  font-size: 0.72rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--accent);
+  font-weight: 600;
+  margin: 0 0 18px;
+}
+.masthead h1 {
+  font-size: 2.45rem;
+  line-height: 1.12;
+  font-weight: 600;
+  letter-spacing: -0.012em;
+  margin: 0 0 18px;
+}
+.subtitle {
+  font-size: 1.22rem;
+  color: var(--ink-soft);
+  font-style: italic;
+  margin: 0 0 24px;
+  max-width: 38em;
+}
+.byline {
+  font-family: "Inter", system-ui, sans-serif;
+  font-size: 0.95rem;
+  color: var(--ink);
+  margin: 0;
+}
+.byline .note,
+.note {
+  color: var(--muted);
+  font-style: italic;
+}
+.note { font-size: 0.92em; }
+
+/* ---- Table of contents / nav ---- */
+.toc {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: rgba(251, 250, 247, 0.92);
+  backdrop-filter: saturate(180%) blur(8px);
+  border-bottom: 1px solid var(--rule);
+}
+.toc .wrap {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 22px;
+  padding-top: 12px;
+  padding-bottom: 12px;
+}
+.toc a {
+  font-family: "Inter", system-ui, sans-serif;
+  font-size: 0.82rem;
+  letter-spacing: 0.01em;
+  color: var(--ink-soft);
+  text-decoration: none;
+  font-weight: 500;
+}
+.toc a:hover { color: var(--accent); }
+
+/* ---- Sections ---- */
+main { padding: 16px 0 24px; }
+
+section {
+  padding: 34px 0;
+  border-bottom: 1px solid var(--rule);
+}
+section:last-of-type { border-bottom: none; }
+
+h2 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  margin: 0 0 16px;
+  scroll-margin-top: 64px;
+}
+section { scroll-margin-top: 64px; }
+
+p { margin: 0 0 16px; }
+p:last-child { margin-bottom: 0; }
+
+strong { font-weight: 600; }
+
+a {
+  color: var(--accent);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 2px;
+}
+
+code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.82em;
+  background: var(--accent-bg);
+  color: var(--accent);
+  padding: 0.1em 0.38em;
+  border-radius: 4px;
+}
+
+ul, ol { margin: 0 0 16px; padding-left: 1.3em; }
+li { margin: 0 0 9px; }
+ul.deliverables li, ol li { padding-left: 0.2em; }
+
+/* ---- Schedule table ---- */
+.schedule {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.97rem;
+  margin: 4px 0 10px;
+}
+.schedule th, .schedule td {
+  text-align: left;
+  padding: 11px 12px;
+  border-bottom: 1px solid var(--rule);
+  vertical-align: top;
+}
+.schedule thead th {
+  font-family: "Inter", system-ui, sans-serif;
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+  font-weight: 600;
+  border-bottom: 1.5px solid var(--ink);
+}
+.schedule td:first-child {
+  font-family: "Inter", system-ui, sans-serif;
+  font-weight: 600;
+  white-space: nowrap;
+  color: var(--accent);
+}
+.schedule td:nth-child(2) {
+  font-family: "Inter", system-ui, sans-serif;
+  font-size: 0.86rem;
+  color: var(--ink-soft);
+  white-space: nowrap;
+}
+.schedule tbody tr:hover { background: var(--accent-bg); }
+
+.caption, .references, .muted {
+  font-size: 0.92rem;
+  color: var(--muted);
+}
+.caption { margin-top: 6px; font-style: italic; }
+
+/* ---- References ---- */
+.references { color: var(--ink-soft); font-size: 0.95rem; line-height: 1.5; }
+.references li { margin-bottom: 11px; }
+
+/* ---- Footer ---- */
+footer {
+  border-top: 1px solid var(--rule);
+  padding: 30px 0 60px;
+  font-family: "Inter", system-ui, sans-serif;
+  font-size: 0.85rem;
+  color: var(--ink-soft);
+}
+footer p { margin: 0 0 4px; }
+footer .muted { color: var(--muted); }
+
+/* ---- Responsive ---- */
+@media (max-width: 600px) {
+  body { font-size: 18px; }
+  .masthead { padding: 48px 0 32px; }
+  .masthead h1 { font-size: 1.95rem; }
+  .subtitle { font-size: 1.1rem; }
+  .schedule td:nth-child(2) { white-space: normal; }
+}

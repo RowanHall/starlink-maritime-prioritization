@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Prioritizing Maritime Starlink Traffic for Commercial Fishing Vessels — CSC 466</title>
+  <meta name="description" content="CSC 466 project proposal: edge traffic prioritization and Active Queue Management to protect latency-sensitive operational traffic on Starlink-connected commercial fishing vessels." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header class="masthead">
+    <div class="wrap">
+      <p class="eyebrow">CSC 466 &middot; University of Victoria &middot; Fall 2026</p>
+      <h1>Prioritizing Maritime Starlink Traffic for Commercial Fishing Vessels</h1>
+      <p class="subtitle">
+        Edge traffic prioritization and Active Queue Management to protect latency-sensitive
+        operational traffic under heavy crew demand on fluctuating satellite links.
+      </p>
+      <p class="byline">
+        Jasper McLennan &middot; Rowan Hall
+        <span class="note">(Open to a third member — reach out in Teams.)</span>
+      </p>
+    </div>
+  </header>
+
+  <nav class="toc">
+    <div class="wrap">
+      <a href="#problem">Problem</a>
+      <a href="#priorwork">Prior Work</a>
+      <a href="#approach">Approach</a>
+      <a href="#deliverables">Deliverables</a>
+      <a href="#schedule">Schedule</a>
+      <a href="#resources">Resources</a>
+      <a href="#references">References</a>
+    </div>
+  </nav>
+
+  <main class="wrap">
+    <section id="problem">
+      <h2>1. Problem &amp; Motivation</h2>
+      <p>
+        Commercial fishing vessels increasingly rely on Starlink for both essential operations
+        and crew welfare. A recurring operational challenge is severe uplink saturation and
+        <strong>bufferbloat</strong>: when off-shift crew use high-bandwidth applications
+        (video streaming, cloud backups, large downloads), the shared link's queues fill and
+        latency spikes from tens of milliseconds into seconds. These spikes degrade and
+        occasionally disrupt <strong>latency-sensitive operational traffic</strong> — bridge
+        communications, vessel telematics, position reporting, and messaging.
+      </p>
+      <p>
+        At sea there is no fallback link. The practical response today is a blunt one: operators
+        enforce strict rules that limit crew to messaging and occasional browsing to avoid
+        interfering with ship operations. This protects the bridge but wastes capacity that is
+        often idle, and it treats a scheduling problem as a policy problem. Having worked in the
+        fishing industry, we have lived this trade-off directly. The question we want to answer
+        is whether <em>smart queue management at the edge</em> can protect critical traffic
+        automatically, letting crew use the network freely without ever taking down bridge
+        communications.
+      </p>
+    </section>
+
+    <section id="priorwork">
+      <h2>2. What Has Been Done — and Why It Falls Short</h2>
+      <p>
+        The networking community has largely solved bufferbloat on <em>stable</em> links.
+        Active Queue Management (AQM) algorithms such as <strong>CoDel</strong> and its flow-queuing
+        variant <strong>FQ-CoDel</strong> keep standing queues short by targeting queue
+        <em>sojourn time</em> rather than occupancy, and <strong>CAKE</strong> bundles shaping,
+        flow isolation, and host fairness into a single tin. These are mature, deployed, and
+        well understood — but they assume a reasonably steady egress rate.
+      </p>
+      <p>
+        Starlink breaks that assumption. Its low-Earth-orbit capacity fluctuates on sub-second
+        to multi-second timescales as satellites hand off, with periodic reconfiguration
+        intervals and weather- and obstruction-driven variability. A fixed shaper rate set
+        conservatively wastes capacity; set optimistically, it reintroduces the very queues AQM
+        is meant to drain. Vendor-side QoS on the terminal is opaque and not tunable per vessel,
+        and consumer prioritization features do not express maritime operational intent (e.g.
+        "bridge telematics always wins, crew streaming yields"). Published Starlink measurement
+        studies document the latency variability but stop short of evaluating edge QoS policies
+        tuned to it. Prior AQM work rarely targets a link this volatile or this operationally
+        critical.
+      </p>
+    </section>
+
+    <section id="approach">
+      <h2>3. Our Approach — Why We Can Do Better</h2>
+      <p>
+        We will place an <strong>edge gateway</strong> between the Starlink terminal and the
+        vessel LAN and treat prioritization as an adaptive control problem rather than a static
+        configuration. Two complementary techniques:
+      </p>
+      <ul>
+        <li>
+          <strong>Operational-intent QoS:</strong> classify traffic into tiers (operational /
+          interactive / bulk) and give operational traffic strict priority with flow-isolated
+          AQM (FQ-CoDel or CAKE's <code>diffserv</code> modes) so crew bulk transfers can only
+          consume the capacity that operational traffic is not using.
+        </li>
+        <li>
+          <strong>Dynamic rate adaptation:</strong> because a fixed shaper rate is wrong on
+          Starlink, we will track the link's recent achievable rate and latency and adjust the
+          shaper continuously — keeping the bottleneck queue at the edge, where we control it,
+          instead of inside the opaque terminal.
+        </li>
+      </ul>
+      <p>
+        Our differentiator is the setting and the evaluation: we tune and measure these policies
+        against Starlink's real volatility and against a concrete maritime objective — bounded
+        worst-case latency for operational traffic under adversarial crew load — rather than
+        average throughput on a stable testbed. Our firsthand knowledge of vessel operations
+        lets us define realistic traffic classes and load scenarios.
+      </p>
+      <p>Concretely, the work proceeds in two phases:</p>
+      <ol>
+        <li>
+          <strong>Benchmark &amp; test locally.</strong> Establish baseline latency-under-load,
+          then compare queueing/QoS policies on a controlled testbed (and, if available, UVic's
+          Starlink setup). Standard bufferbloat tooling (<code>flent</code>, RRUL,
+          <code>irtt</code>) drives reproducible load.
+        </li>
+        <li>
+          <strong>Deploy on a real vessel terminal.</strong> Run the most promising configuration
+          on an edge router connected to an active Starlink terminal and measure real-world
+          improvement under genuine crew load.
+        </li>
+      </ol>
+    </section>
+
+    <section id="deliverables">
+      <h2>4. Expected Deliverables</h2>
+      <ul class="deliverables">
+        <li>A reproducible <strong>benchmark methodology</strong> and baseline dataset characterizing latency-under-load on Starlink.</li>
+        <li>A comparative <strong>evaluation of AQM/QoS policies</strong> (FQ-CoDel, CAKE, static vs. dynamic rate shaping) against latency and fairness metrics.</li>
+        <li>A documented <strong>edge-gateway configuration</strong> (scripts / router config) implementing the best policy.</li>
+        <li><strong>Real-world results</strong> from deployment on an active vessel terminal, where access permits.</li>
+        <li>A <strong>final report</strong> and this <strong>public project website</strong>, kept current throughout the term.</li>
+      </ul>
+    </section>
+
+    <section id="schedule">
+      <h2>5. Biweekly Schedule</h2>
+      <table class="schedule">
+        <thead>
+          <tr><th>Weeks</th><th>Dates (2026)</th><th>Milestone</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>1&ndash;2</td><td>Oct 9 &ndash; Oct 23</td><td>Finalize proposal; secure testbed / confirm UVic Starlink &amp; vessel access; literature review of AQM + Starlink measurement.</td></tr>
+          <tr><td>3&ndash;4</td><td>Oct 23 &ndash; Nov 6</td><td>Build controlled testbed; implement benchmark harness; collect baseline latency-under-load.</td></tr>
+          <tr><td>5&ndash;6</td><td>Nov 6 &ndash; Nov 20</td><td>Implement and compare QoS/AQM policies (FQ-CoDel, CAKE, static vs. dynamic shaping); select best configuration.</td></tr>
+          <tr><td>7&ndash;8</td><td>Nov 20 &ndash; Dec 4</td><td>Deploy on active vessel terminal; measure real-world performance under crew load.</td></tr>
+          <tr><td>9</td><td>Dec 4 &ndash; term end</td><td>Analyze results; finalize report, website, and presentation.</td></tr>
+        </tbody>
+      </table>
+      <p class="caption">Dates are indicative and will track the official CSC 466 term calendar.</p>
+    </section>
+
+    <section id="resources">
+      <h2>6. Resources Needed</h2>
+      <ul>
+        <li><strong>Starlink access</strong> for testing — ideally UVic's Starlink setup for controlled experiments, plus an active vessel terminal for field deployment. <span class="note">(Pending confirmation of UVic Starlink availability for student experiments.)</span></li>
+        <li><strong>Edge hardware:</strong> a Linux-capable router/gateway (e.g. OpenWrt device or small x86 box) supporting <code>tc</code>, FQ-CoDel, and CAKE.</li>
+        <li><strong>Open-source tooling:</strong> <code>flent</code>, <code>irtt</code>, <code>iperf3</code>, and the Linux traffic-control stack — no licensing cost.</li>
+        <li><strong>Vessel operator cooperation</strong> for scheduling realistic load scenarios during field tests.</li>
+      </ul>
+    </section>
+
+    <section id="references">
+      <h2>References</h2>
+      <ol class="references">
+        <li>K. Nichols and V. Jacobson, &ldquo;Controlling Queue Delay,&rdquo; <em>ACM Queue</em>, vol. 10, no. 5, 2012.</li>
+        <li>T. Hoeiland-Joergensen, P. McKenney, D. Taht, J. Gettys, and E. Dumazet, &ldquo;The Flow Queue CoDel Packet Scheduler and Active Queue Management Algorithm,&rdquo; RFC 8290, IETF, 2018.</li>
+        <li>T. Hoeiland-Joergensen, D. Taht, and J. Morton, &ldquo;Piece of CAKE: A Comprehensive Queue Management Solution for Home Gateways,&rdquo; <em>IEEE LANMAN</em>, 2018.</li>
+        <li>J. Gettys and K. Nichols, &ldquo;Bufferbloat: Dark Buffers in the Internet,&rdquo; <em>ACM Queue</em>, vol. 9, no. 11, 2011.</li>
+        <li>M. M. Kassem et al. / recent Starlink measurement studies characterizing LEO latency and throughput variability (e.g. IMC / PAM Starlink measurement work, 2023&ndash;2024).</li>
+        <li>The Bufferbloat Project, &ldquo;flent&rdquo; and &ldquo;CeroWrt&rdquo; tooling. <a href="https://www.bufferbloat.net/">bufferbloat.net</a></li>
+      </ol>
+    </section>
+  </main>
+
+  <footer>
+    <div class="wrap">
+      <p>CSC 466 Project Proposal &middot; University of Victoria &middot; Fall 2026</p>
+      <p class="muted">This page is maintained throughout the term as the project progresses.</p>
+    </div>
+  </footer>
+</body>
+</html>
